@@ -6,6 +6,9 @@ import (
 	"image/jpeg"
 	"io/ioutil"
 	"net/http"
+	"strings"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gorilla/mux"
 )
@@ -43,12 +46,20 @@ func GetImage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	imageName := vars["imageName"]
 
-	file, err := ioutil.ReadFile(serverConfig.ImgsFolder + "/" + imageName)
+	imgFakePath := ImgFakePath{}
+	err := imgFakePathCollection.Find(bson.M{"fake": imageName}).One(&imgFakePath)
+	check(err)
+
+	fmt.Println(serverConfig.ImgsFolder + "/" + imgFakePath.Real)
+
+	file, err := ioutil.ReadFile(serverConfig.ImgsFolder + "/" + imgFakePath.Real)
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 
-	img, err := dataToPNG(file, imageName)
+	pathSplited := strings.Split(imgFakePath.Real, ".")
+	imageExtension := pathSplited[len(pathSplited)-1]
+	img, err := dataToImage(file, imageExtension)
 
 	if err != nil {
 		fmt.Fprintln(w, "image "+imageName+" does not exist in server")
@@ -58,7 +69,7 @@ func GetImage(w http.ResponseWriter, r *http.Request) {
 }
 func GetCaptcha(w http.ResponseWriter, r *http.Request) {
 
-	resp := ""
+	resp := generateCaptcha(6)
 	jsonResp, err := json.Marshal(resp)
 	check(err)
 	fmt.Fprintln(w, string(jsonResp))
