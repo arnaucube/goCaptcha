@@ -17,7 +17,7 @@ type MongoConfig struct {
 var mongoConfig MongoConfig
 
 var captchaCollection *mgo.Collection
-var captchaSolutionCollection *mgo.Collection
+var captchaSolCollection *mgo.Collection
 var imgFakePathCollection *mgo.Collection
 
 func readMongodbConfig(path string) {

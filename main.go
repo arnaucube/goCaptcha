@@ -20,7 +20,7 @@ func main() {
 	session, err := getSession()
 	check(err)
 	captchaCollection = getCollection(session, "captchas")
-	captchaSolutionCollection = getCollection(session, "captchassolutions")
+	captchaSolCollection = getCollection(session, "captchassolutions")
 	imgFakePathCollection = getCollection(session, "imgfakepath")
 
 	//start the server

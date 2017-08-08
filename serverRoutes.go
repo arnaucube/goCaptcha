@@ -34,6 +34,12 @@ var routes = Routes{
 		"/captcha",
 		GetCaptcha,
 	},
+	Route{
+		"AnswerCaptcha",
+		"POST",
+		"/answer",
+		AnswerCaptcha,
+	},
 }
 
 //ROUTES
@@ -70,6 +76,19 @@ func GetImage(w http.ResponseWriter, r *http.Request) {
 func GetCaptcha(w http.ResponseWriter, r *http.Request) {
 
 	resp := generateCaptcha(6)
+	jsonResp, err := json.Marshal(resp)
+	check(err)
+	fmt.Fprintln(w, string(jsonResp))
+}
+
+func AnswerCaptcha(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var captchaAnswer CaptchaAnswer
+	err := decoder.Decode(&captchaAnswer)
+	check(err)
+	defer r.Body.Close()
+
+	resp := validateCaptcha(captchaAnswer)
 	jsonResp, err := json.Marshal(resp)
 	check(err)
 	fmt.Fprintln(w, string(jsonResp))

@@ -4,6 +4,8 @@ import (
 	"math/rand"
 	"os/exec"
 	"strings"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 type Captcha struct {
@@ -12,12 +14,16 @@ type Captcha struct {
 	Question string   `json:"question"`
 	Date     string   `json:"date"`
 }
-type CaptchaSolution struct {
+type CaptchaSol struct {
 	Id           string   `json:"id"`
 	Imgs         []string `json:"imgs"`
 	ImgsSolution []string `json:"imgssolution"`
-	Question     string   `json:"question"`
+	Question     string   `json:"question"` //select all X
 	Date         string   `json:"date"`
+}
+type CaptchaAnswer struct {
+	CaptchaId string `json:"captchaid"`
+	Selection []int  `json:"selection"`
 }
 type ImgFakePath struct {
 	CaptchaId string `json:"captchaid"`
@@ -38,7 +44,7 @@ func generateRandInt(min int, max int) int {
 }
 func generateCaptcha(count int) Captcha {
 	var captcha Captcha
-	var captchaSol CaptchaSolution
+	var captchaSol CaptchaSol
 
 	captcha.Id = generateUUID()
 	captchaSol.Id = captcha.Id
@@ -57,11 +63,36 @@ func generateCaptcha(count int) Captcha {
 		captchaSol.Imgs = append(captchaSol.Imgs, dataset[categDataset[nCateg]][nImg])
 		captchaSol.ImgsSolution = append(captchaSol.ImgsSolution, categDataset[nCateg])
 	}
-	captcha.Question = "Select all leopards"
-	captchaSol.Question = "Select all leopards"
+	captcha.Question = "leopard"
+	captchaSol.Question = "leopard"
 	err := captchaCollection.Insert(captcha)
 	check(err)
-	err = captchaSolutionCollection.Insert(captchaSol)
+	err = captchaSolCollection.Insert(captchaSol)
 	check(err)
 	return captcha
+}
+func validateCaptcha(captchaAnswer CaptchaAnswer) bool {
+	var solved bool
+	solved = true
+	captchaSol := CaptchaSol{}
+	err := captchaSolCollection.Find(bson.M{"id": captchaAnswer.CaptchaId}).One(&captchaSol)
+	check(err)
+	for k, imgSol := range captchaSol.ImgsSolution {
+		if imgSol == captchaSol.Question {
+			if captchaAnswer.Selection[k] == 1 {
+				//correct
+			} else {
+				solved = false
+			}
+		}
+		if imgSol != captchaSol.Question {
+			if captchaAnswer.Selection[k] == 0 {
+				//correct
+			} else {
+				solved = false
+			}
+		}
+	}
+
+	return solved
 }
