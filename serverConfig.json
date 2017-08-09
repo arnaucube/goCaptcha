@@ -2,5 +2,7 @@
     "serverIP": "127.0.0.1",
     "serverPort": "3025",
     "imgsFolder": "imgs",
-    "numImgsCaptcha": 9
+    "numImgsCaptcha": 9,
+    "suspiciousIPCountLimit": 2,
+    "timeBan": 30
 }

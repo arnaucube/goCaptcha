@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"image/jpeg"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"gopkg.in/mgo.v2/bson"
 
@@ -89,6 +91,51 @@ func AnswerCaptcha(w http.ResponseWriter, r *http.Request) {
 
 	ip := strings.Split(r.RemoteAddr, ":")[0]
 	resp := validateCaptcha(captchaAnswer, ip)
+	//if resp==false add ip to blacklist
+	if resp == false {
+		//get SuspiciousIP
+		suspiciousIP := SuspiciousIP{}
+		err := suspiciousIPCollection.Find(bson.M{"ip": ip}).One(&suspiciousIP)
+		if err != nil {
+			//if not exist, add
+			suspiciousIP.Date = time.Now().Unix()
+			suspiciousIP.IP = ip
+			suspiciousIP.Count = 0
+			//store suspiciousIP in MongoDB
+			err := suspiciousIPCollection.Insert(suspiciousIP)
+			check(err)
+		} else {
+			//if exist
+			suspiciousIP.Date = time.Now().Unix()
+			suspiciousIP.Count++
+			err := suspiciousIPCollection.Update(bson.M{"ip": ip}, suspiciousIP)
+			check(err)
+		}
+	}
+	//if count > limit, resp=false
+	suspiciousIP := SuspiciousIP{}
+	err = suspiciousIPCollection.Find(bson.M{"ip": ip}).One(&suspiciousIP)
+	if err == nil {
+		//if exist, and time.Since(suspiciousIP.Date) < serverConfig.TimeBan, increase counter
+		if time.Since(time.Unix(suspiciousIP.Date, 0)).Seconds() < serverConfig.TimeBan {
+			if suspiciousIP.Count > serverConfig.SuspiciousIPCountLimit {
+				if resp == false {
+					log.Println("IP: " + ip + ", has reached limit count of SuspiciousIP")
+				}
+				resp = false
+			}
+		} else {
+			//timeBan is completed, delete counter
+			err := suspiciousIPCollection.Remove(bson.M{"ip": ip})
+			check(err)
+		}
+		if resp == true {
+			//answered correct, delete counter
+			err := suspiciousIPCollection.Remove(bson.M{"ip": ip})
+			check(err)
+		}
+	}
+
 	jsonResp, err := json.Marshal(resp)
 	check(err)
 	fmt.Fprintln(w, string(jsonResp))

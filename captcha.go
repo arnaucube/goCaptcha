@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"os/exec"
 	"strings"
@@ -21,7 +20,7 @@ type CaptchaSol struct {
 	ImgsSolution []string `json:"imgssolution"`
 	Question     string   `json:"question"` //select all X
 	Date         int64    `json:"date"`
-	Ip           string   `json:"ip"`
+	IP           string   `json:"ip"`
 }
 type CaptchaAnswer struct {
 	CaptchaId string `json:"captchaid"`
@@ -31,6 +30,11 @@ type ImgFakePath struct {
 	CaptchaId string `json:"captchaid"`
 	Real      string `json:"real"`
 	Fake      string `json:"fake"`
+}
+type SuspiciousIP struct {
+	Date  int64  `json:"date"`
+	IP    string `json:"ip"`
+	Count int    `json:"count"`
 }
 
 func generateUUID() string {
@@ -72,7 +76,7 @@ func generateCaptcha(count int, ip string) Captcha {
 	captcha.Question = question
 	captchaSol.Question = question
 	captchaSol.Date = time.Now().Unix()
-	captchaSol.Ip = ip
+	captchaSol.IP = ip
 	err := captchaSolCollection.Insert(captchaSol)
 	check(err)
 	return captcha
@@ -103,7 +107,6 @@ func validateCaptcha(captchaAnswer CaptchaAnswer, ip string) bool {
 	//time elapsed from captcha generation comprovation
 	date := time.Unix(captchaSol.Date, 0)
 	elapsed := time.Since(date)
-	fmt.Println(elapsed.Seconds())
 	if elapsed.Seconds() < 1 {
 		solved = false
 	}
@@ -111,7 +114,7 @@ func validateCaptcha(captchaAnswer CaptchaAnswer, ip string) bool {
 		solved = false
 	}
 	//ip comprovation
-	if captchaSol.Ip != ip {
+	if captchaSol.IP != ip {
 		solved = false
 	}
 	return solved

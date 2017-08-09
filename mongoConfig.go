@@ -16,9 +16,10 @@ type MongoConfig struct {
 
 var mongoConfig MongoConfig
 
-var captchaCollection *mgo.Collection
+//var captchaCollection *mgo.Collection
 var captchaSolCollection *mgo.Collection
 var imgFakePathCollection *mgo.Collection
+var suspiciousIPCollection *mgo.Collection
 
 func readMongodbConfig(path string) {
 	file, e := ioutil.ReadFile(path)

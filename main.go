@@ -19,9 +19,10 @@ func main() {
 	readMongodbConfig("./mongodbConfig.json")
 	session, err := getSession()
 	check(err)
-	captchaCollection = getCollection(session, "captchas")
+	//captchaCollection = getCollection(session, "captchas")
 	captchaSolCollection = getCollection(session, "captchassolutions")
 	imgFakePathCollection = getCollection(session, "imgfakepath")
+	suspiciousIPCollection = getCollection(session, "suspiciousip")
 
 	//start the server
 	//http server start

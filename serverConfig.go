@@ -20,10 +20,12 @@ type Route struct {
 
 //server config
 type ServerConfig struct {
-	ServerIP       string `json:"serverIP"`
-	ServerPort     string `json:"serverPort"`
-	ImgsFolder     string `json:"imgsFolder"`
-	NumImgsCaptcha int    `json:"numImgsCaptcha"`
+	ServerIP               string  `json:"serverIP"`
+	ServerPort             string  `json:"serverPort"`
+	ImgsFolder             string  `json:"imgsFolder"`
+	NumImgsCaptcha         int     `json:"numImgsCaptcha"`
+	SuspiciousIPCountLimit int     `json:"suspiciousIPCountLimit"`
+	TimeBan                float64 `json:"timeBan"`
 }
 
 var serverConfig ServerConfig

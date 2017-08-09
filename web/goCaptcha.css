@@ -1,10 +1,16 @@
-
+#goCaptcha{
+    max-width: 380px;
+}
 .c_blue300{
     background: #64B5F6!important;
     color: #ffffff!important;
 }
 .c_red300{
     background: #E57373!important;
+    color: #ffffff!important;
+}
+.c_green300{
+    background: #81C784!important;
     color: #ffffff!important;
 }
 .g_button{
@@ -31,8 +37,8 @@
     float: right;
 }
 .g_selected{
-    border: 4px solid yellow;
+    border: 5px solid #64B5F6;
 }
 .g_unselected{
-    border: 4px solid white;
+    border: 5px solid white;
 }

@@ -33,7 +33,7 @@ function showCaptcha(captcha) {
     html = "";
     html += "<h2>Select all " + captcha.question + "s</h2>";
     for (k in captcha.imgs) {
-        html += "<img id='" + k + "' onclick='selectCaptchaImg(this)' src='" + goCaptchaURL + "/image/" + captcha.imgs[k] + "' style='width:150px;cursor:pointer;' />";
+        html += "<img id='" + k + "' onclick='selectCaptchaImg(this)' src='" + goCaptchaURL + "/image/" + captcha.imgs[k] + "' style='width:120px;cursor:pointer;' class='g_unselected' />";
     }
     html += "<div onclick='validateCaptcha()' class='g_button c_blue300 g_floatRight'>Validate</div>";
     document.getElementById("goCaptcha").innerHTML = html;
@@ -59,6 +59,7 @@ function validateCaptcha() {
     var html = "";
     if (resp) {
         html += "<h2>goCaptcha validated</h2>";
+        html += "<div onclick='getCaptcha()' class='g_button c_green300 g_floatRight'>Reload Captcha</div>";
     } else {
         html += "<h2>goCaptcha failed</h2>";
         html += "<div onclick='getCaptcha()' class='g_button c_red300 g_floatRight'>Reload Captcha</div>";
