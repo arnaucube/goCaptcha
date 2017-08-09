@@ -21,6 +21,7 @@ type CaptchaSol struct {
 	ImgsSolution []string `json:"imgssolution"`
 	Question     string   `json:"question"` //select all X
 	Date         int64    `json:"date"`
+	Ip           string   `json:"ip"`
 }
 type CaptchaAnswer struct {
 	CaptchaId string `json:"captchaid"`
@@ -47,7 +48,7 @@ func generateQuestionFromCategoriesArray(imgs []string) string {
 	n := generateRandInt(0, len(imgs))
 	return imgs[n]
 }
-func generateCaptcha(count int) Captcha {
+func generateCaptcha(count int, ip string) Captcha {
 	var captcha Captcha
 	var captchaSol CaptchaSol
 
@@ -71,11 +72,12 @@ func generateCaptcha(count int) Captcha {
 	captcha.Question = question
 	captchaSol.Question = question
 	captchaSol.Date = time.Now().Unix()
+	captchaSol.Ip = ip
 	err := captchaSolCollection.Insert(captchaSol)
 	check(err)
 	return captcha
 }
-func validateCaptcha(captchaAnswer CaptchaAnswer) bool {
+func validateCaptcha(captchaAnswer CaptchaAnswer, ip string) bool {
 	var solved bool
 	solved = true
 	captchaSol := CaptchaSol{}
@@ -106,6 +108,10 @@ func validateCaptcha(captchaAnswer CaptchaAnswer) bool {
 		solved = false
 	}
 	if elapsed.Seconds() > 60 {
+		solved = false
+	}
+	//ip comprovation
+	if captchaSol.Ip != ip {
 		solved = false
 	}
 	return solved

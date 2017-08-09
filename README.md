@@ -21,6 +21,16 @@ It will place the goCaptcha box in the div:
 
 ### 1.2 - Backend
 - Put dataset images in the folder 'imgs'.
+- Configure serverConfig.json:
+```json
+{
+    "serverIP": "127.0.0.1",
+    "serverPort": "3025",
+    "imgsFolder": "imgs",
+    "numImgsCaptcha": 9
+}
+```
+
 - Run MongoDB.
 - Go to the folder /goCaptcha, and run:
 ```
@@ -183,3 +193,4 @@ If the selection is correct, returns 'true', if the selection is not correct, re
 - If the captcha is resolved in less than 1 second, it's not valid.
 - If the captcha is resolved in more than 1 minute, it's not valid.
 - The images url, are UUIDs generated each time, in order to give different names for the images each time.
+- The ip of requested captcha and answered captcha petitions must be the same.

@@ -1,5 +1,6 @@
 {
     "serverIP": "127.0.0.1",
     "serverPort": "3025",
-    "imgsFolder": "imgs"
+    "imgsFolder": "imgs",
+    "numImgsCaptcha": 9
 }

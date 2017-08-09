@@ -20,9 +20,10 @@ type Route struct {
 
 //server config
 type ServerConfig struct {
-	ServerIP   string `json:"serverIP"`
-	ServerPort string `json:"serverPort"`
-	ImgsFolder string `json:"imgsFolder"`
+	ServerIP       string `json:"serverIP"`
+	ServerPort     string `json:"serverPort"`
+	ImgsFolder     string `json:"imgsFolder"`
+	NumImgsCaptcha int    `json:"numImgsCaptcha"`
 }
 
 var serverConfig ServerConfig

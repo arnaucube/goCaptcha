@@ -56,8 +56,6 @@ func GetImage(w http.ResponseWriter, r *http.Request) {
 	err := imgFakePathCollection.Find(bson.M{"fake": imageName}).One(&imgFakePath)
 	check(err)
 
-	fmt.Println(serverConfig.ImgsFolder + "/" + imgFakePath.Real)
-
 	file, err := ioutil.ReadFile(serverConfig.ImgsFolder + "/" + imgFakePath.Real)
 	if err != nil {
 		fmt.Fprintln(w, err)
@@ -75,7 +73,8 @@ func GetImage(w http.ResponseWriter, r *http.Request) {
 }
 func GetCaptcha(w http.ResponseWriter, r *http.Request) {
 
-	resp := generateCaptcha(6)
+	ip := strings.Split(r.RemoteAddr, ":")[0]
+	resp := generateCaptcha(serverConfig.NumImgsCaptcha, ip)
 	jsonResp, err := json.Marshal(resp)
 	check(err)
 	fmt.Fprintln(w, string(jsonResp))
@@ -88,7 +87,8 @@ func AnswerCaptcha(w http.ResponseWriter, r *http.Request) {
 	check(err)
 	defer r.Body.Close()
 
-	resp := validateCaptcha(captchaAnswer)
+	ip := strings.Split(r.RemoteAddr, ":")[0]
+	resp := validateCaptcha(captchaAnswer, ip)
 	jsonResp, err := json.Marshal(resp)
 	check(err)
 	fmt.Fprintln(w, string(jsonResp))

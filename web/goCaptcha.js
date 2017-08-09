@@ -1,5 +1,5 @@
 
-var selection = [0, 0, 0, 0, 0, 0];
+var selection = [];
 var captchaid = "";
 
 function httpGet(url) {
@@ -22,6 +22,10 @@ function getCaptcha() {
     captcha = JSON.parse(data);
     captchaid = captcha.id;
     showCaptcha(captcha);
+    selection=[];
+    for(k in captcha.imgs){
+        selection.push(0);
+    }
 }
 
 function showCaptcha(captcha) {
@@ -56,7 +60,6 @@ function validateCaptcha() {
     if (resp) {
         html += "<h2>goCaptcha validated</h2>";
     } else {
-        selection = [0, 0, 0, 0, 0, 0];
         html += "<h2>goCaptcha failed</h2>";
         html += "<div onclick='getCaptcha()' class='g_button c_red300 g_floatRight'>Reload Captcha</div>";
     }
