@@ -1,8 +1,43 @@
 # goCaptcha
 captcha server, with own datasets, to train own machine learning AI
 
-
 ### How to use?
+#### Frontend
+Insert this lines in the html file:
+```html
+    <link rel="stylesheet" href="goCaptcha.css">
+
+    <div id="goCaptcha"></div>
+
+    <script>//define the url where is placed the server of goCaptcha
+        var goCaptchaURL = "http://127.0.0.1:3025";
+    </script>
+    <script src="goCaptcha.js"></script>
+```
+
+It will place the goCaptcha box in the div:
+
+![goCaptcha](https://raw.githubusercontent.com/arnaucode/goCaptcha/master/demo01.png "goCaptcha")
+
+#### Backend
+- Put dataset images in the folder 'imgs'.
+- Run MongoDB.
+- Go to the folder /goCaptcha, and run:
+```
+./goCaptcha
+```
+It will show:
+```
+user@laptop:~/goCaptcha$ ./goCaptcha
+    goCaptcha started
+    dataset read
+    num of dataset categories: 4
+    server running
+    port: 3025
+```
+
+
+### How to make the petitions?
 
 1. Get the captcha:
 ```
@@ -113,6 +148,19 @@ CaptchaSolution Model
 }
 ```
 Both models are stored in the MongoDB.
+
+The Captcha Model 'imgs' parameter, are UUIDs generated to set 'random' names to images. The server stores into MongoDB the relation between the 'random' name of each image and the real path of the image:
+```json
+{
+    "captchaid" : "881c6083-0643-4d1c-9987-f8cc5bb9d5b1",
+    "real" : "leopard/image_0092.jpg",
+    "fake" : "1b838c46-b784-471e-b143-48be058c39a7.png"
+}
+```
+When the server recieves a petition to get an image, recieves the petition with the fake image name, then, gets the real path of the image, gets it and serves the image content under the fake image name:
+```
+127.0.0.1:3025/image/1b838c46-b784-471e-b143-48be058c39a7.png
+```
 
 Captcha Model contains the captcha that server returns to the petition. And CaptchaSolution contains the solution of the captcha. Both have the same Id.
 
