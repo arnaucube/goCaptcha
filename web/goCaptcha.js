@@ -29,13 +29,13 @@ function showCaptcha(captcha) {
     html = "";
     html += "<h2>Select all " + captcha.question + "s</h2>";
     for (k in captcha.imgs) {
-        html += "<img id='" + k + "' onclick='select(this)' src='" + goCaptchaURL + "/image/" + captcha.imgs[k] + "' style='width:150px;' />";
+        html += "<img id='" + k + "' onclick='selectCaptchaImg(this)' src='" + goCaptchaURL + "/image/" + captcha.imgs[k] + "' style='width:150px;cursor:pointer;' />";
     }
-    html += "<div onclick='validate()' class='g_button c_blue300 g_floatRight'>Validate</div>";
+    html += "<div onclick='validateCaptcha()' class='g_button c_blue300 g_floatRight'>Validate</div>";
     document.getElementById("goCaptcha").innerHTML = html;
 }
 
-function select(elem) {
+function selectCaptchaImg(elem) {
     if (selection[elem.id] == 0) {
         selection[elem.id] = 1;
         document.getElementById(elem.id).className = "g_selected";
@@ -45,7 +45,7 @@ function select(elem) {
     }
 }
 
-function validate() {
+function validateCaptcha() {
     var answer = {
         selection: selection,
         captchaid: captcha.id
@@ -56,7 +56,9 @@ function validate() {
     if (resp) {
         html += "<h2>goCaptcha validated</h2>";
     } else {
+        selection = [0, 0, 0, 0, 0, 0];
         html += "<h2>goCaptcha failed</h2>";
+        html += "<div onclick='getCaptcha()' class='g_button c_red300 g_floatRight'>Reload Captcha</div>";
     }
     document.getElementById("goCaptcha").innerHTML = html;
 }

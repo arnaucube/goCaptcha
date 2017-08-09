@@ -1,8 +1,8 @@
 # goCaptcha
 captcha server, with own datasets, to train own machine learning AI
 
-### How to use?
-#### Frontend
+## 1 - How to use?
+### 1.1 - Frontend
 Insert this lines in the html file:
 ```html
     <link rel="stylesheet" href="goCaptcha.css">
@@ -19,7 +19,7 @@ It will place the goCaptcha box in the div:
 
 ![goCaptcha](https://raw.githubusercontent.com/arnaucode/goCaptcha/master/demo01.png "goCaptcha")
 
-#### Backend
+### 1.2 - Backend
 - Put dataset images in the folder 'imgs'.
 - Run MongoDB.
 - Go to the folder /goCaptcha, and run:
@@ -37,9 +37,9 @@ user@laptop:~/goCaptcha$ ./goCaptcha
 ```
 
 
-### How to make the petitions?
+## 2 - How to make the petitions?
 
-1. Get the captcha:
+### 2.1 - Get the captcha:
 ```
 GET/ 127.0.0.1:3025/captcha
 ```
@@ -56,14 +56,20 @@ Server response:
         "1b838c46-b784-471e-b143-48be058c39a7.png"
     ],
     "question": "leopard",
-    "date": ""
+    "date": "1502274893"
 }
 ```
 
-2. User selects the images that fit in the 'question' parameter
+### 2.2 - User selects the images that fit in the 'question' parameter
 (in this case, 'leopard')
 
-3. Post the answer. The answer contains the CaptchaId, and an array with the selected images
+The selection is stored in an array:
+```js
+    selection=[0,0,1,0,1,0];
+```
+Where the '1' are the images selected, in the images array order.
+
+### 2.3 - Post the answer. The answer contains the CaptchaId, and an array with the selected images
 ```
 POST/ 127.0.0.1:3025/answer
 ```
@@ -71,7 +77,7 @@ Post example:
 ```json
 {
 	"captchaid": "881c6083-0643-4d1c-9987-f8cc5bb9d5b1",
-	"selection": [0,0,0,0,1,1]
+	"selection": [0,0,1,0,1,0]
 }
 ```
 Server response:
@@ -79,9 +85,9 @@ Server response:
 true
 ```
 
-### How this works?
+## 3 - How this works?
 
-###### Server reads dataset
+### 3.1 - Server reads dataset
 First, server reads all dataset. Dataset is a directory with subdirectories, where each subdirectory contains images of one element.
 
 For example:
@@ -104,7 +110,7 @@ imgs/
 Then, stores all the filenames corresponding to each subdirectory. So, we have each image and to which element category is (the name of subdirectory).
 
 
-###### Server generates captcha
+### 3.2 - Server generates captcha
 When server recieves a GET /captcha, generates a captcha, getting random images from the dataset.
 
 For each captcha generated, generates two mongodb models:
@@ -144,7 +150,8 @@ CaptchaSolution Model
         "leopard",
         "leopard"
     ],
-    "question" : "leopard"
+    "question" : "leopard",
+    "date": "1502274893"
 }
 ```
 Both models are stored in the MongoDB.
@@ -165,7 +172,14 @@ When the server recieves a petition to get an image, recieves the petition with 
 Captcha Model contains the captcha that server returns to the petition. And CaptchaSolution contains the solution of the captcha. Both have the same Id.
 
 
-###### Server validates captcha
+### 3.3 - Server validates captcha
 When server recieves POST /answer, gets the answer, search for the CaptchaSolution based on the CaptchaId in the MongoDB, and then compares the answer 'selection' parameter with the CaptchaSolution.
 
 If the selection is correct, returns 'true', if the selection is not correct, returns 'false'.
+
+
+## 4 - Security
+
+- If the captcha is resolved in less than 1 second, it's not valid.
+- If the captcha is resolved in more than 1 minute, it's not valid.
+- The images url, are UUIDs generated each time, in order to give different names for the images each time.

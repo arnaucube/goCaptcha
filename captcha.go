@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"os/exec"
 	"strings"
+	"time"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -16,10 +18,9 @@ type Captcha struct {
 }
 type CaptchaSol struct {
 	Id           string   `json:"id"`
-	Imgs         []string `json:"imgs"`
 	ImgsSolution []string `json:"imgssolution"`
 	Question     string   `json:"question"` //select all X
-	Date         string   `json:"date"`
+	Date         int64    `json:"date"`
 }
 type CaptchaAnswer struct {
 	CaptchaId string `json:"captchaid"`
@@ -42,6 +43,10 @@ func generateRandInt(min int, max int) int {
 	//rand.Seed(time.Now().UTC().UnixNano())
 	return rand.Intn(max-min) + min
 }
+func generateQuestionFromCategoriesArray(imgs []string) string {
+	n := generateRandInt(0, len(imgs))
+	return imgs[n]
+}
 func generateCaptcha(count int) Captcha {
 	var captcha Captcha
 	var captchaSol CaptchaSol
@@ -60,14 +65,13 @@ func generateCaptcha(count int) Captcha {
 		err := imgFakePathCollection.Insert(imgFakePath)
 		check(err)
 		captcha.Imgs = append(captcha.Imgs, imgFakePath.Fake)
-		captchaSol.Imgs = append(captchaSol.Imgs, dataset[categDataset[nCateg]][nImg])
 		captchaSol.ImgsSolution = append(captchaSol.ImgsSolution, categDataset[nCateg])
 	}
-	captcha.Question = "leopard"
-	captchaSol.Question = "leopard"
-	err := captchaCollection.Insert(captcha)
-	check(err)
-	err = captchaSolCollection.Insert(captchaSol)
+	question := generateQuestionFromCategoriesArray(captchaSol.ImgsSolution)
+	captcha.Question = question
+	captchaSol.Question = question
+	captchaSol.Date = time.Now().Unix()
+	err := captchaSolCollection.Insert(captchaSol)
 	check(err)
 	return captcha
 }
@@ -94,5 +98,15 @@ func validateCaptcha(captchaAnswer CaptchaAnswer) bool {
 		}
 	}
 
+	//time elapsed from captcha generation comprovation
+	date := time.Unix(captchaSol.Date, 0)
+	elapsed := time.Since(date)
+	fmt.Println(elapsed.Seconds())
+	if elapsed.Seconds() < 1 {
+		solved = false
+	}
+	if elapsed.Seconds() > 60 {
+		solved = false
+	}
 	return solved
 }
