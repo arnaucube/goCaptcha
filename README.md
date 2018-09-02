@@ -1,14 +1,21 @@
 # goCaptcha
-captcha server, with own datasets, to train own machine learning AI
+captcha server, with own datasets
 
 ## 0 - Why?
 Captcha systems are useful to avoid bots posting data on databases. But modern captcha systems are from enterprises to train machine learning algorithms, and monetize results.
 When user answers a captcha, is training the AI from the enterprise.
 
-This project, aims to be a self hosted captcha system, that trains own AI.
+This project, aims to be a self hosted captcha system. A future plan is add a functionallity that trains own AI.
 To avoid feeding AI from companies.
 
 ## 1 - How to use?
+### 1.0 - Requirements
+- backend server with
+  - goCaptcha binary
+  - MongoDB
+- frontend with the goCaptcha.js and goCaptcha.css inserted
+
+
 ### 1.1 - Frontend
 Insert this lines in the html file:
 ```html
@@ -201,7 +208,7 @@ If the selection is correct, returns 'true', if the selection is not correct, re
 ## 4 - Security
 
 - If the captcha is resolved in less than 1 second, it's not valid.
-- If the captcha is resolved in more than 1 minute, it's not valid.
+- If the captcha is resolved in more than X seconds, it's not valid.
 - The images url, are UUIDs generated each time, in order to give different names for the images each time.
 - The ip of requested captcha and answered captcha petitions must be the same.
 - Each time a user fails answering the captcha, the server adds a counter to the IP and stores in to MongoDB. When the counter on that IP is greather than the value 'suspiciousIPCountLimit' defined in serverConfig.json, the IP is blocked for 'timeBan' seconds, also defined in serverConfig.json.

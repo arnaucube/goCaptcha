@@ -31,7 +31,7 @@ function getCaptcha() {
 function showCaptcha(captcha) {
     var html;
     html = "";
-    html += "<h2>Select all " + captcha.question + "s</h2>";
+    html += "<h2>Select all " + captcha.question + "</h2>";
     for (k in captcha.imgs) {
         html += "<img id='" + k + "' onclick='selectCaptchaImg(this)' src='" + goCaptchaURL + "/image/" + captcha.imgs[k] + "' style='width:120px;cursor:pointer;' class='g_unselected' />";
     }

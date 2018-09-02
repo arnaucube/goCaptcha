@@ -136,6 +136,13 @@ func AnswerCaptcha(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// delete the captchaSolution from MongoDB
+	captchaSolCollection.RemoveAll(bson.M{"id": captchaAnswer.CaptchaId})
+	check(err)
+	// delete the fakepaths from MongoDB
+	imgFakePathCollection.RemoveAll(bson.M{"captchaid": captchaAnswer.CaptchaId})
+	check(err)
+
 	jsonResp, err := json.Marshal(resp)
 	check(err)
 	fmt.Fprintln(w, string(jsonResp))
